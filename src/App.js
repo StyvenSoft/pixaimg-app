@@ -6,12 +6,44 @@ class App extends Component{
 
   state = {
     term : '',
-    images : []
+    images : [],
+    page : ''   
+  }
+
+  scroll = () => {
+    const element = document.querySelector('.jumbotron');
+    element.scrollIntoView('smooth', 'start');
+  }
+
+  paginationPrevious = () =>{
+    let page = this.state.page;
+    if(page === 1) return null;
+    page--;
+    this.setState({
+      page
+    }, () =>{
+      this.searchApi();
+      this.scroll();
+    });
+    console.log("Anterior")
+  }
+
+  paginationNext = () =>{
+    let page = this.state.page;
+    page++;
+    this.setState({
+      page
+    }, () =>{
+      this.searchApi();
+      this.scroll();
+    });
+    console.log("Siguiente")
   }
 
   searchApi = () =>{
     const terms = this.state.term;
-    const url = `https://pixabay.com/api/?key=14436935-576eb479a35a06e9082a2ddf4&q=${terms}`;
+    const page = this.state.page;
+    const url = `https://pixabay.com/api/?key=14436935-576eb479a35a06e9082a2ddf4&q=${terms}&page=${page}`;
     //console.log(url);
     fetch(url)
       .then(response => response.json())
@@ -21,7 +53,8 @@ class App extends Component{
   dataSearch = (term) => {
     //console.log(term)
     this.setState({
-      term
+      term : term,
+      page : 1
     }, () =>{
       this.searchApi();
     })
@@ -35,7 +68,9 @@ class App extends Component{
             <Searcher dataSearch = { this.dataSearch }/>
           </div>
           { this.state.term } 
-          <Result images = { this.state.images } />
+          <div className="row justify-content-center">
+            <Result images = { this.state.images } paginationPrevious = { this.paginationPrevious }  paginationNext = { this.paginationNext }/>
+          </div>
       </div>
     );
   }
